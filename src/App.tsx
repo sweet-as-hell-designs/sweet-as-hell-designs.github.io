@@ -81,7 +81,7 @@ function App() {
         timestamp: new Date(now).toISOString(),
       }),
     }).catch((error: unknown) => {
-      console.warn('[LaminarBridge] Twilio ghost broadcast failed', error);
+      console.warn('[TwilioGhostBroadcast] Twilio ghost broadcast failed', error);
     });
   }, [bridgeStatus, evolutionData.evolutionLevel]);
 
