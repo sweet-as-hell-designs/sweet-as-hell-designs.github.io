@@ -2,7 +2,7 @@ export interface StrikeEntry {
   id: number;
   timestamp: number;
   message: string;
-  type: 'collision' | 'proposal' | 'error';
+  type: 'collision' | 'proposal' | 'error' | 'cascade';
 }
 
 export type SovereignStatus =
@@ -27,6 +27,15 @@ export interface SovereignEnvironment {
   renderSovereignReply: (proposal: string) => void;
   calculateWeight: () => number;
   forceInterference: () => void;
+  shadowRoot?: string;
+  metaReferences?: {
+    gordonMetadata: {
+      alias: string;
+      persistence: 'shadow-root';
+      lastBridgeStatus: SovereignStatus;
+      updatedAt: number;
+    };
+  };
 }
 
 declare global {

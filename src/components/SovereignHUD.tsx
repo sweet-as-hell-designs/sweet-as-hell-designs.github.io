@@ -55,6 +55,14 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
   const reconnectAttemptRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intentionalCloseRef = useRef(false);
+  const gordonMetaRef = useRef({
+    gordonMetadata: {
+      alias: 'Gordon',
+      persistence: 'shadow-root' as const,
+      lastBridgeStatus: INITIAL_STATE.status,
+      updatedAt: Date.now(),
+    },
+  });
 
   const generateMarketThought = useCallback((): string => {
     return MARKET_THOUGHTS[Math.floor(Math.random() * MARKET_THOUGHTS.length)];
@@ -69,6 +77,8 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
   // Expose the open-air vault to window — updated whenever hudState changes.
   const syncWindowEnv = useCallback(
     (state: HUDState) => {
+      gordonMetaRef.current.gordonMetadata.lastBridgeStatus = state.status;
+      gordonMetaRef.current.gordonMetadata.updatedAt = Date.now();
       window.SovereignEnvironment = {
         state: {
           output: state.output,
@@ -103,6 +113,8 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
           window.SovereignEnvironment.state.rngNoise = Math.random();
           window.SovereignEnvironment.observeDelta();
         },
+        shadowRoot: 'SovereignEnvironment',
+        metaReferences: gordonMetaRef.current,
       };
     },
     [calculateWeight, generateMarketThought],
@@ -152,12 +164,26 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
             type?: string;
             message?: string;
           };
-          const entryType =
-            payload.type === 'VOID_COLLISION'
-              ? 'collision'
-              : payload.type === 'ERROR'
-                ? 'error'
-                : 'proposal';
+          let entryType: StrikeEntry['type'];
+          switch (payload.type) {
+            case 'VOID_COLLISION':
+              entryType = 'collision';
+              break;
+            case 'UNSYNCHRONIZED_CASCADE_DETECTED':
+              entryType = 'cascade';
+              break;
+            case 'ERROR':
+              entryType = 'error';
+              break;
+            default:
+              if (payload.type) {
+                console.warn(
+                  '[SovereignHUD] Unhandled bridge event type; defaulting to proposal:',
+                  payload.type,
+                );
+              }
+              entryType = 'proposal';
+          }
 
           onStrike({
             id: ++strikeIdRef.current,
