@@ -49,12 +49,12 @@ function App() {
       const updated = [...prev, entry];
       return updated.length > MAX_STRIKES ? updated.slice(-MAX_STRIKES) : updated;
     });
+    let nextBridgeStatus = entry.type === 'collision' ? 'VOID_COLLISION' : 'ACTUALIZED';
     if (entry.type === 'cascade') {
-      setBridgeStatus('UNSYNCHRONIZED_CASCADE_DETECTED');
+      nextBridgeStatus = 'UNSYNCHRONIZED_CASCADE_DETECTED';
       setCascadeCount((prev) => prev + 1);
-      return;
     }
-    setBridgeStatus(entry.type === 'collision' ? 'VOID_COLLISION' : 'ACTUALIZED');
+    setBridgeStatus(nextBridgeStatus);
   }, []);
 
   const evolutionData = {
@@ -82,7 +82,7 @@ function App() {
         timestamp: new Date(now).toISOString(),
       }),
     }).catch((error: unknown) => {
-      console.warn('[TwilioGhostBroadcast] Twilio ghost broadcast failed', error);
+      console.error('[TwilioGhostBroadcast] Twilio ghost broadcast failed', error);
     });
   }, [bridgeStatus, evolutionData.evolutionLevel]);
 

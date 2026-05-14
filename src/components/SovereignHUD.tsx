@@ -164,14 +164,20 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
             type?: string;
             message?: string;
           };
-          const entryType =
-            payload.type === 'VOID_COLLISION'
-              ? 'collision'
-              : payload.type === 'UNSYNCHRONIZED_CASCADE_DETECTED'
-                ? 'cascade'
-              : payload.type === 'ERROR'
-                ? 'error'
-                : 'proposal';
+          let entryType: StrikeEntry['type'];
+          switch (payload.type) {
+            case 'VOID_COLLISION':
+              entryType = 'collision';
+              break;
+            case 'UNSYNCHRONIZED_CASCADE_DETECTED':
+              entryType = 'cascade';
+              break;
+            case 'ERROR':
+              entryType = 'error';
+              break;
+            default:
+              entryType = 'proposal';
+          }
 
           onStrike({
             id: ++strikeIdRef.current,
