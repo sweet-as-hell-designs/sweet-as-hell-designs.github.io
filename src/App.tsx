@@ -16,7 +16,7 @@ function App() {
   }, []);
 
   const evolutionData = {
-    evolutionLevel: meshActive ? (0.9).toString() : 'TODO',
+    evolutionLevel: meshActive ? 0.9 : ('TODO' as const),
     quantumSignature: bridgeStatus,
   };
 

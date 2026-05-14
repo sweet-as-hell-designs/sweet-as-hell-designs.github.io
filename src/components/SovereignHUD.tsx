@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { StrikeEntry, SovereignStatus } from '../types';
 
-const WS_URL = 'ws://localhost:9090';
+const WS_URL = import.meta.env.VITE_WS_URL ?? 'ws://localhost:9090';
 
 const MARKET_THOUGHTS = [
   'Tension detected in CVD. Liquidity shifting upward.',

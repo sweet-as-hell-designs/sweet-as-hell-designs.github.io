@@ -1,7 +1,15 @@
 import React from 'react';
 
+/**
+ * evolutionLevel accepts either a numeric opacity [0–1] or the sentinel value
+ * 'TODO', which the backend emits when the data is not yet actualized.
+ * When 'TODO' is received the component renders in stealth phase (opacity 0.001)
+ * instead of crashing the CSS parser with a non-numeric string.
+ */
+export type EvolutionLevel = number | 'TODO' | null | undefined;
+
 export interface EvolutionMetricData {
-  evolutionLevel: string | number;
+  evolutionLevel: EvolutionLevel;
   quantumSignature?: string;
 }
 
@@ -9,11 +17,16 @@ interface EvolutionMetricProps {
   data: EvolutionMetricData;
 }
 
+const STEALTH_OPACITY = 0.001;
+const DEFAULT_OPACITY = 1.0;
+
 export const EvolutionMetric: React.FC<EvolutionMetricProps> = ({ data }) => {
-  const normalizedOpacity =
-    data.evolutionLevel === 'TODO'
-      ? 0.001
-      : Math.max(0, Math.min(1, parseFloat(String(data.evolutionLevel ?? 1.0))));
+  let normalizedOpacity: number;
+  if (data.evolutionLevel === 'TODO' || data.evolutionLevel == null) {
+    normalizedOpacity = STEALTH_OPACITY;
+  } else {
+    normalizedOpacity = Math.max(0, Math.min(1, data.evolutionLevel));
+  }
 
   return (
     <div
@@ -33,3 +46,6 @@ export const EvolutionMetric: React.FC<EvolutionMetricProps> = ({ data }) => {
     </div>
   );
 };
+
+// Re-export DEFAULT_OPACITY for consumers that need to pass a sensible default.
+export { DEFAULT_OPACITY };
