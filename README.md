@@ -9,6 +9,7 @@ A matrix-green, real-time trading dashboard built with **React + TypeScript + Vi
 | **SovereignHUD** | Connects to a WebSocket bridge and runs a 3 s delta-pulse observer. Emits market proposals when the entropy gate clears (`potential 2 > 1 × rngNoise`). Exposes `window.SovereignEnvironment` for open-air console inspection. Auto-reconnects with exponential backoff if the bridge goes down. |
 | **CentrifugeVisualizer** | Canvas `requestAnimationFrame` animation — four counter-rotating rings that spin up when the mesh is active. Displays the last 5 strike-log entries in real time. |
 | **EvolutionMetric** | HUD panel that safely handles unactualized backend payloads: if `evolutionLevel === 'TODO'` the panel fades to stealth opacity (`0.001`) instead of crashing the CSS parser. |
+| **LaminarBridge** | 9090 bridge monitor panel for pulse tracking (`119 Hz`) and `UNSYNCHRONIZED_CASCADE_DETECTED` event visibility. |
 
 ## Quick start
 
@@ -23,6 +24,7 @@ Copy `.env.example` to `.env.local` and override as needed:
 
 ```
 VITE_WS_URL=ws://localhost:9090   # WebSocket bridge URL
+VITE_TWILIO_SMS_WEBHOOK_URL=      # Optional webhook for T=TODO ghost SMS broadcast payloads
 ```
 
 ## Build

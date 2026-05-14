@@ -1,12 +1,14 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { SovereignHUD } from './components/SovereignHUD';
 import { CentrifugeVisualizer } from './components/CentrifugeVisualizer';
 import { EvolutionMetric } from './components/HUD/MetricsDisplay';
+import { LaminarBridge } from './components/LaminarBridge';
 import type { StrikeEntry } from './types';
 import './App.css';
 
 /** Cap the in-memory strike log to avoid unbounded memory growth. */
 const MAX_STRIKES = 500;
+const TWILIO_SMS_WEBHOOK_URL = import.meta.env.VITE_TWILIO_SMS_WEBHOOK_URL;
 
 function useUptime(active: boolean): string {
   // Only updated from inside the setInterval callback — never synchronously
@@ -37,6 +39,8 @@ function App() {
   const [meshActive, setMeshActive] = useState(false);
   const [strikeLog, setStrikeLog] = useState<StrikeEntry[]>([]);
   const [bridgeStatus, setBridgeStatus] = useState<string>('OFFLINE');
+  const lastTodoBroadcastRef = useRef<number>(0);
+  const [cascadeCount, setCascadeCount] = useState(0);
   const uptime = useUptime(meshActive);
 
   const handleStrike = useCallback((entry: StrikeEntry) => {
@@ -44,6 +48,11 @@ function App() {
       const updated = [...prev, entry];
       return updated.length > MAX_STRIKES ? updated.slice(-MAX_STRIKES) : updated;
     });
+    if (entry.type === 'cascade') {
+      setBridgeStatus('UNSYNCHRONIZED_CASCADE_DETECTED');
+      setCascadeCount((prev) => prev + 1);
+      return;
+    }
     setBridgeStatus(entry.type === 'collision' ? 'VOID_COLLISION' : 'ACTUALIZED');
   }, []);
 
@@ -51,6 +60,30 @@ function App() {
     evolutionLevel: meshActive ? 0.9 : ('TODO' as const),
     quantumSignature: bridgeStatus,
   };
+
+  useEffect(() => {
+    if (evolutionData.evolutionLevel !== 'TODO' || !TWILIO_SMS_WEBHOOK_URL) {
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastTodoBroadcastRef.current < 60_000) {
+      return;
+    }
+
+    lastTodoBroadcastRef.current = now;
+    void fetch(TWILIO_SMS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'T=TODO_GHOST',
+        bridgeStatus,
+        timestamp: new Date(now).toISOString(),
+      }),
+    }).catch((error: unknown) => {
+      console.warn('[LaminarBridge] Twilio ghost broadcast failed', error);
+    });
+  }, [bridgeStatus, evolutionData.evolutionLevel]);
 
   return (
     <div className="app-layout">
@@ -103,8 +136,18 @@ function App() {
               <span className="telemetry-stats__label">Mesh Uptime</span>
               <span className="telemetry-stats__value">{uptime}</span>
             </div>
+            <div className="telemetry-stats__row">
+              <span className="telemetry-stats__label">Cascade Events</span>
+              <span className="telemetry-stats__value">{cascadeCount}</span>
+            </div>
           </div>
         </section>
+
+        <LaminarBridge
+          meshActive={meshActive}
+          bridgeStatus={bridgeStatus}
+          cascadeCount={cascadeCount}
+        />
       </div>
     </div>
   );

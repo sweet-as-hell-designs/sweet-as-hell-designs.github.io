@@ -330,6 +330,10 @@ body {
   color: #ff4444;
 }
 
+.centrifuge-container__log-entry--cascade {
+  color: #ff9b42;
+}
+
 .centrifuge-container__log-time {
   color: var(--text-dim);
   font-size: 10px;
@@ -389,4 +393,34 @@ body {
 
 .telemetry-stats__value {
   color: var(--matrix-green);
+}
+
+/* ============================================================
+   Laminar Bridge
+   ============================================================ */
+
+.laminar-bridge {
+  grid-column: 1 / 2;
+}
+
+.laminar-bridge__row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.06);
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.laminar-bridge__label {
+  color: var(--text-dim);
+}
+
+.laminar-bridge__value {
+  color: var(--matrix-green);
+}
+
+@media (max-width: 768px) {
+  .laminar-bridge {
+    grid-column: 1;
+  }
 }
