@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# Sweet As Hell Designs — Sovereign Environment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A matrix-green, real-time trading dashboard built with **React + TypeScript + Vite**, deployed to GitHub Pages.
 
-Currently, two official plugins are available:
+## What it does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Component | Purpose |
+|---|---|
+| **SovereignHUD** | Connects to a WebSocket bridge and runs a 3 s delta-pulse observer. Emits market proposals when the entropy gate clears (`potential 2 > 1 × rngNoise`). Exposes `window.SovereignEnvironment` for open-air console inspection. Auto-reconnects with exponential backoff if the bridge goes down. |
+| **CentrifugeVisualizer** | Canvas `requestAnimationFrame` animation — four counter-rotating rings that spin up when the mesh is active. Displays the last 5 strike-log entries in real time. |
+| **EvolutionMetric** | HUD panel that safely handles unactualized backend payloads: if `evolutionLevel === 'TODO'` the panel fades to stealth opacity (`0.001`) instead of crashing the CSS parser. |
 
-## React Compiler
+## Quick start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm install
+npm run dev          # http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Environment variables
+
+Copy `.env.example` to `.env.local` and override as needed:
+
+```
+VITE_WS_URL=ws://localhost:9090   # WebSocket bridge URL
+```
+
+## Build
+
+```sh
+npm run build    # output → dist/
+npm run preview  # preview the production build locally
+```
+
+## Deployment
+
+Push to `main` — the [deploy workflow](.github/workflows/deploy.yml) builds the app and publishes the `dist/` folder to GitHub Pages automatically.
+
+## Console API (open-air vault)
+
+While the mesh is engaged, the full sovereign state is accessible in the browser console:
 
 ```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+window.SovereignEnvironment.state            // current state snapshot
+window.SovereignEnvironment.observeDelta()   // manually trigger a delta pulse
+window.SovereignEnvironment.forceInterference() // inject random entropy
+window.SovereignEnvironment.calculateWeight()   // → opacity weight float
 ```
+
+## Requirements
+
+- Node.js >= 20

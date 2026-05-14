@@ -217,6 +217,16 @@ body {
   text-shadow: var(--glow);
 }
 
+.sovereign-hud__ws--reconnecting {
+  color: var(--matrix-yellow);
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
 .sovereign-hud__ws--error {
   color: #ff4444;
 }

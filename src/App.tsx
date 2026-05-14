@@ -1,17 +1,47 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { SovereignHUD } from './components/SovereignHUD';
 import { CentrifugeVisualizer } from './components/CentrifugeVisualizer';
 import { EvolutionMetric } from './components/HUD/MetricsDisplay';
 import type { StrikeEntry } from './types';
 import './App.css';
 
+/** Cap the in-memory strike log to avoid unbounded memory growth. */
+const MAX_STRIKES = 500;
+
+function useUptime(active: boolean): string {
+  // Only updated from inside the setInterval callback — never synchronously
+  // inside the effect body — to satisfy react-hooks/set-state-in-effect.
+  const [display, setDisplay] = useState('00:00');
+
+  useEffect(() => {
+    if (!active) return;
+    const start = Date.now();
+    const id = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const ss = String(elapsed % 60).padStart(2, '0');
+      setDisplay(`${mm}:${ss}`);
+    }, 1000);
+    return () => {
+      clearInterval(id);
+      setDisplay('00:00');
+    };
+  }, [active]);
+
+  return active ? display : '—';
+}
+
 function App() {
   const [meshActive, setMeshActive] = useState(false);
   const [strikeLog, setStrikeLog] = useState<StrikeEntry[]>([]);
   const [bridgeStatus, setBridgeStatus] = useState<string>('OFFLINE');
+  const uptime = useUptime(meshActive);
 
   const handleStrike = useCallback((entry: StrikeEntry) => {
-    setStrikeLog((prev) => [...prev, entry]);
+    setStrikeLog((prev) => {
+      const updated = [...prev, entry];
+      return updated.length > MAX_STRIKES ? updated.slice(-MAX_STRIKES) : updated;
+    });
     setBridgeStatus(entry.type === 'collision' ? 'VOID_COLLISION' : 'ACTUALIZED');
   }, []);
 
@@ -66,6 +96,10 @@ function App() {
               <span className="telemetry-stats__value">
                 {meshActive ? '119 Hz' : '—'}
               </span>
+            </div>
+            <div className="telemetry-stats__row">
+              <span className="telemetry-stats__label">Mesh Uptime</span>
+              <span className="telemetry-stats__value">{uptime}</span>
             </div>
           </div>
         </section>

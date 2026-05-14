@@ -3,6 +3,11 @@ import type { StrikeEntry, SovereignStatus } from '../types';
 
 const WS_URL = import.meta.env.VITE_WS_URL ?? 'ws://localhost:9090';
 
+/** Reconnect base delay in ms; doubles with each failed attempt. */
+const RECONNECT_BASE_MS = 2_000;
+/** Reconnect delay cap — never wait longer than 30 s. */
+const RECONNECT_MAX_MS = 30_000;
+
 const MARKET_THOUGHTS = [
   'Tension detected in CVD. Liquidity shifting upward.',
   'OBI Symmetry shattering. Momentum accelerating.',
@@ -11,6 +16,8 @@ const MARKET_THOUGHTS = [
   'Void collision imminent. Spread compression active.',
   'RNG gate cleared. Proposal actualized.',
 ];
+
+type WsBridgeStatus = 'LIVE' | 'RECONNECTING' | 'ERROR' | 'OFFLINE';
 
 interface SovereignHUDProps {
   meshActive: boolean;
@@ -24,38 +31,42 @@ interface HUDState {
   output: number;
   consumption: number;
   proposal: string | null;
-  wsBridgeStatus: string;
+  wsBridgeStatus: WsBridgeStatus;
 }
+
+const INITIAL_STATE: HUDState = {
+  status: 'AUTHENTICATED',
+  rngNoise: 0,
+  deltaDensity: 0,
+  output: 1.0,
+  consumption: 0.1,
+  proposal: null,
+  wsBridgeStatus: 'OFFLINE',
+};
 
 export const SovereignHUD: React.FC<SovereignHUDProps> = ({
   meshActive,
   onStrike,
 }) => {
-  const [hudState, setHudState] = useState<HUDState>({
-    status: 'AUTHENTICATED',
-    rngNoise: 0,
-    deltaDensity: 0,
-    output: 1.0,
-    consumption: 0.1,
-    proposal: null,
-    wsBridgeStatus: 'OFFLINE',
-  });
+  const [hudState, setHudState] = useState<HUDState>(INITIAL_STATE);
 
   const wsRef = useRef<WebSocket | null>(null);
   const strikeIdRef = useRef(0);
+  const reconnectAttemptRef = useRef(0);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const intentionalCloseRef = useRef(false);
 
   const generateMarketThought = useCallback((): string => {
     return MARKET_THOUGHTS[Math.floor(Math.random() * MARKET_THOUGHTS.length)];
   }, []);
 
   const calculateWeight = useCallback(
-    (output: number, consumption: number): number => {
-      return Math.max(0, Math.min(1, parseFloat((output - consumption).toFixed(2))));
-    },
+    (output: number, consumption: number): number =>
+      Math.max(0, Math.min(1, parseFloat((output - consumption).toFixed(2)))),
     [],
   );
 
-  // Expose the open-air vault to window for console inspection
+  // Expose the open-air vault to window — updated whenever hudState changes.
   const syncWindowEnv = useCallback(
     (state: HUDState) => {
       window.SovereignEnvironment = {
@@ -83,7 +94,9 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
         },
         generateMarketThought,
         renderSovereignReply: (proposal: string) => {
-          console.log(`[Actualized] Potential: 2 | Weight: ${calculateWeight(state.output, state.consumption)}`);
+          console.log(
+            `[Actualized] Potential: 2 | Weight: ${calculateWeight(state.output, state.consumption)}`,
+          );
           console.log(`[y] PROPOSAL: ${proposal}`);
         },
         forceInterference: () => {
@@ -95,9 +108,20 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
     [calculateWeight, generateMarketThought],
   );
 
-  // WebSocket sink — bound to 9090 bridge frequency
+  // Sync window.SovereignEnvironment whenever HUD state changes — kept as a
+  // dedicated effect so the state updater functions remain pure.
+  useEffect(() => {
+    syncWindowEnv(hudState);
+  }, [hudState, syncWindowEnv]);
+
+  // WebSocket sink — bound to WS_URL with exponential-backoff auto-reconnect.
   useEffect(() => {
     if (!meshActive) {
+      intentionalCloseRef.current = true;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
       if (wsRef.current) {
         wsRef.current.close();
         wsRef.current = null;
@@ -105,59 +129,89 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
       return;
     }
 
-    // new WebSocket() with a valid URL never throws synchronously;
-    // connection failures surface via onerror/onclose callbacks.
-    const ws = new WebSocket(WS_URL);
-    wsRef.current = ws;
+    intentionalCloseRef.current = false;
+    reconnectAttemptRef.current = 0;
 
-    ws.onopen = () => {
-      setHudState((prev) => ({ ...prev, wsBridgeStatus: 'LIVE' }));
-      console.log('[SovereignHUD] WebSocket bridge live at', WS_URL);
-    };
+    function connect() {
+      if (intentionalCloseRef.current) return;
 
-    ws.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data as string) as {
-          type?: string;
-          message?: string;
-        };
-        const entryType =
-          payload.type === 'VOID_COLLISION'
-            ? 'collision'
-            : payload.type === 'ERROR'
-              ? 'error'
-              : 'proposal';
+      // new WebSocket() with a valid URL never throws synchronously;
+      // connection failures surface via onerror / onclose callbacks.
+      const ws = new WebSocket(WS_URL);
+      wsRef.current = ws;
 
-        onStrike({
-          id: ++strikeIdRef.current,
-          timestamp: Date.now(),
-          message: payload.message ?? JSON.stringify(payload),
-          type: entryType,
-        });
-      } catch {
-        onStrike({
-          id: ++strikeIdRef.current,
-          timestamp: Date.now(),
-          message: String(event.data),
-          type: 'collision',
-        });
-      }
-    };
+      ws.onopen = () => {
+        reconnectAttemptRef.current = 0;
+        setHudState((prev) => ({ ...prev, wsBridgeStatus: 'LIVE' }));
+        console.log('[SovereignHUD] WebSocket bridge live at', WS_URL);
+      };
 
-    ws.onerror = () => {
-      setHudState((prev) => ({ ...prev, wsBridgeStatus: 'ERROR' }));
-    };
+      ws.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data as string) as {
+            type?: string;
+            message?: string;
+          };
+          const entryType =
+            payload.type === 'VOID_COLLISION'
+              ? 'collision'
+              : payload.type === 'ERROR'
+                ? 'error'
+                : 'proposal';
 
-    ws.onclose = () => {
-      setHudState((prev) => ({ ...prev, wsBridgeStatus: 'OFFLINE' }));
-    };
+          onStrike({
+            id: ++strikeIdRef.current,
+            timestamp: Date.now(),
+            message: payload.message ?? JSON.stringify(payload),
+            type: entryType,
+          });
+        } catch {
+          onStrike({
+            id: ++strikeIdRef.current,
+            timestamp: Date.now(),
+            message: String(event.data),
+            type: 'collision',
+          });
+        }
+      };
+
+      ws.onerror = () => {
+        setHudState((prev) => ({ ...prev, wsBridgeStatus: 'ERROR' }));
+      };
+
+      ws.onclose = () => {
+        if (intentionalCloseRef.current) return;
+
+        reconnectAttemptRef.current += 1;
+        const delay = Math.min(
+          RECONNECT_MAX_MS,
+          RECONNECT_BASE_MS * 2 ** reconnectAttemptRef.current,
+        );
+        setHudState((prev) => ({ ...prev, wsBridgeStatus: 'RECONNECTING' }));
+        console.log(
+          `[SovereignHUD] Reconnecting in ${delay}ms (attempt ${reconnectAttemptRef.current})`,
+        );
+        reconnectTimerRef.current = setTimeout(connect, delay);
+      };
+    }
+
+    connect();
+    console.log('[SovereignHUD] WebSocket sink initialised for', WS_URL);
 
     return () => {
-      ws.close();
+      intentionalCloseRef.current = true;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
   }, [meshActive, onStrike]);
 
-  // Observer — runs on 3000 ms cycle, watches for delta pulses
+  // Observer — runs on 3000 ms cycle, watches for delta pulses.
   useEffect(() => {
     if (!meshActive) return;
 
@@ -181,17 +235,14 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
         });
       }
 
-      setHudState((prev) => {
-        const next: HUDState = {
-          ...prev,
-          status: nextStatus,
-          rngNoise,
-          deltaDensity,
-          proposal,
-        };
-        syncWindowEnv(next);
-        return next;
-      });
+      // State updater is kept pure — syncWindowEnv is handled by its own effect.
+      setHudState((prev) => ({
+        ...prev,
+        status: nextStatus,
+        rngNoise,
+        deltaDensity,
+        proposal,
+      }));
     };
 
     // Immediate first tick
@@ -200,10 +251,12 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
     console.log('[SovereignHUD] Sovereign Ouroboros Ignited. Watching for Delta Pulses...');
 
     return () => clearInterval(intervalId);
-  }, [meshActive, generateMarketThought, onStrike, syncWindowEnv]);
+  }, [meshActive, generateMarketThought, onStrike]);
 
   const weight = calculateWeight(hudState.output, hudState.consumption);
-  const displayWsStatus = meshActive ? hudState.wsBridgeStatus : 'OFFLINE';
+  const displayWsStatus: WsBridgeStatus = meshActive
+    ? hudState.wsBridgeStatus
+    : 'OFFLINE';
 
   return (
     <div
@@ -233,9 +286,7 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
       )}
 
       <div className="sovereign-hud__metrics">
-        <span>
-          Entropy (rng): {hudState.rngNoise.toFixed(4)}
-        </span>
+        <span>Entropy (rng): {hudState.rngNoise.toFixed(4)}</span>
         <span>Potential: 2</span>
         <span>Weight: {weight.toFixed(2)}</span>
       </div>
