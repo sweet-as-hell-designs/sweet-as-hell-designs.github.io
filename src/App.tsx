@@ -24,7 +24,9 @@ function useUptime(active: boolean): string {
     }, 1000);
     return () => {
       clearInterval(id);
-      setDisplay('00:00');
+      // Do NOT call setDisplay here — doing so on an unmounted component
+      // triggers a React warning. The caller uses `active ? display : '—'`
+      // so stale display values are never shown when the mesh is off.
     };
   }, [active]);
 

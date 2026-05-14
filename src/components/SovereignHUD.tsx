@@ -183,10 +183,10 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
         if (intentionalCloseRef.current) return;
 
         reconnectAttemptRef.current += 1;
-        const delay = Math.min(
-          RECONNECT_MAX_MS,
-          RECONNECT_BASE_MS * 2 ** reconnectAttemptRef.current,
-        );
+        // Cap the exponent so we never compute pointlessly large powers:
+        // 2000 * 2^4 = 32 000 already saturates RECONNECT_MAX_MS (30 000).
+        const exponent = Math.min(reconnectAttemptRef.current, 4);
+        const delay = Math.min(RECONNECT_MAX_MS, RECONNECT_BASE_MS * 2 ** exponent);
         setHudState((prev) => ({ ...prev, wsBridgeStatus: 'RECONNECTING' }));
         console.log(
           `[SovereignHUD] Reconnecting in ${delay}ms (attempt ${reconnectAttemptRef.current})`,
