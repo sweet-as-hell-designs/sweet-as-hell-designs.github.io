@@ -81,9 +81,25 @@ function App() {
         bridgeStatus,
         timestamp: new Date(now).toISOString(),
       }),
-    }).catch((error: unknown) => {
-      console.error('[TwilioGhostBroadcast] Twilio ghost broadcast failed', error);
-    });
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP_${response.status}`);
+        }
+      })
+      .catch((error: unknown) => {
+        let webhookHost = 'invalid-url';
+        try {
+          webhookHost = new URL(TWILIO_SMS_WEBHOOK_URL).host;
+        } catch {
+          webhookHost = 'invalid-url';
+        }
+        console.error('[TwilioGhostBroadcast] Twilio ghost broadcast failed', {
+          webhookHost,
+          bridgeStatus,
+          error,
+        });
+      });
   }, [bridgeStatus, evolutionData.evolutionLevel]);
 
   return (

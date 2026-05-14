@@ -176,6 +176,12 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
               entryType = 'error';
               break;
             default:
+              if (payload.type) {
+                console.warn(
+                  '[SovereignHUD] Unhandled bridge event type; defaulting to proposal:',
+                  payload.type,
+                );
+              }
               entryType = 'proposal';
           }
 
