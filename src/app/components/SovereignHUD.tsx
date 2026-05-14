@@ -60,7 +60,7 @@ export function SovereignHUD() {
         if (potential > (1.0 * nextRngNoise)) {
           nextStatus = "ACTUALIZING_PROPOSAL";
           nextProposal = MARKET_THOUGHTS[Math.floor(Math.random() * MARKET_THOUGHTS.length)];
-          console.log(\`[Actualized] Potential: 2 | Weight: \${(prevState.output - prevState.consumption).toFixed(2)} | Proposal: \${nextProposal}\`);
+          console.log(`[Actualized] Potential: 2 | Weight: ${(prevState.output - prevState.consumption).toFixed(2)} | Proposal: ${nextProposal}`);
         }
 
         const newState = {
@@ -102,7 +102,7 @@ export function SovereignHUD() {
   // Safe opacity calculation (Weightless Monitor)
   const weight = state.output - state.consumption;
   const opacity = Math.max(0.1, Math.min(1.0, weight));
-  const logStr = state.strikeLog.map(s => \`[\${s.p}:\${s.e}]\`).join(' ');
+  const logStr = state.strikeLog.map(s => `[${s.p}:${s.e}]`).join(' ');
 
   return (
     <>

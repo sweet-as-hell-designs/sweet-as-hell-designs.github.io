@@ -23,7 +23,7 @@ export function VantagePointLattice({ isRunning, currentStateId }: { isRunning: 
         const type = types[Math.floor(Math.random() * types.length)];
         
         const newView: VantagePoint = {
-          id: \`\${Date.now()}-\${Math.random()}\`,
+          id: `${Date.now()}-${Math.random()}`,
           x: Math.random() * 90 + 5, // 5% to 95%
           y: Math.random() * 90 + 5,
           stateId: currentStateId,
@@ -57,11 +57,11 @@ export function VantagePointLattice({ isRunning, currentStateId }: { isRunning: 
             animate={{ opacity: 1, scale: 1, z: 0 }}
             exit={{ opacity: 0, scale: 0.5, filter: 'blur(10px)' }}
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            className={\`absolute w-32 backdrop-blur-sm border rounded-lg p-2 font-mono text-[8px] uppercase tracking-wider \${getColorForType(view.type)}\`}
+            className={`absolute w-32 backdrop-blur-sm border rounded-lg p-2 font-mono text-[8px] uppercase tracking-wider ${getColorForType(view.type)}`}
             style={{ 
-              left: \`\${view.x}%\`, 
-              top: \`\${view.y}%\`,
-              transform: \`translate(-50%, -50%)\`
+              left: `${view.x}%`, 
+              top: `${view.y}%`,
+              transform: `translate(-50%, -50%)`
             }}
           >
             <div className="flex justify-between border-b border-current pb-1 mb-1 opacity-70">
