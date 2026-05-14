@@ -7,6 +7,7 @@ interface LaminarBridgeProps {
 }
 
 const TARGET_HZ = 119;
+const PULSE_TOLERANCE_HZ = 5;
 const PULSE_INTERVAL_MS = 1000 / TARGET_HZ;
 
 export const LaminarBridge: React.FC<LaminarBridgeProps> = ({
@@ -45,7 +46,8 @@ export const LaminarBridge: React.FC<LaminarBridgeProps> = ({
     };
   }, [meshActive]);
 
-  const pulseHealth = Math.abs(observedHz - TARGET_HZ) <= 5 ? 'SYNCED' : 'DRIFT';
+  const pulseHealth =
+    Math.abs(observedHz - TARGET_HZ) <= PULSE_TOLERANCE_HZ ? 'SYNCED' : 'DRIFT';
 
   return (
     <section className="app-grid__panel laminar-bridge" aria-label="Laminar bridge monitor">

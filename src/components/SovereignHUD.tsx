@@ -56,7 +56,7 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intentionalCloseRef = useRef(false);
   const gordonMetaRef = useRef({
-    gordon: {
+    gordonMetadata: {
       alias: 'Gordon',
       persistence: 'shadow-root' as const,
       lastBridgeStatus: INITIAL_STATE.status,
@@ -77,8 +77,8 @@ export const SovereignHUD: React.FC<SovereignHUDProps> = ({
   // Expose the open-air vault to window — updated whenever hudState changes.
   const syncWindowEnv = useCallback(
     (state: HUDState) => {
-      gordonMetaRef.current.gordon.lastBridgeStatus = state.status;
-      gordonMetaRef.current.gordon.updatedAt = Date.now();
+      gordonMetaRef.current.gordonMetadata.lastBridgeStatus = state.status;
+      gordonMetaRef.current.gordonMetadata.updatedAt = Date.now();
       window.SovereignEnvironment = {
         state: {
           output: state.output,

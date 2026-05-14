@@ -9,6 +9,7 @@ import './App.css';
 /** Cap the in-memory strike log to avoid unbounded memory growth. */
 const MAX_STRIKES = 500;
 const TWILIO_SMS_WEBHOOK_URL = import.meta.env.VITE_TWILIO_SMS_WEBHOOK_URL;
+const TODO_BROADCAST_COOLDOWN_MS = 60_000;
 
 function useUptime(active: boolean): string {
   // Only updated from inside the setInterval callback — never synchronously
@@ -67,7 +68,7 @@ function App() {
     }
 
     const now = Date.now();
-    if (now - lastTodoBroadcastRef.current < 60_000) {
+    if (now - lastTodoBroadcastRef.current < TODO_BROADCAST_COOLDOWN_MS) {
       return;
     }
 

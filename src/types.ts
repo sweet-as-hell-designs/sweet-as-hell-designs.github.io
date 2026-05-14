@@ -29,7 +29,7 @@ export interface SovereignEnvironment {
   forceInterference: () => void;
   shadowRoot?: string;
   metaReferences?: {
-    gordon: {
+    gordonMetadata: {
       alias: string;
       persistence: 'shadow-root';
       lastBridgeStatus: SovereignStatus;
