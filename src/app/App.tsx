@@ -21,6 +21,8 @@ import { SovereignHUD } from './components/SovereignHUD';
 import { VantagePointLattice } from './components/VantagePointLattice';
 import { CentrifugeVisualizer } from './components/CentrifugeVisualizer';
 import { EvolutionMetric } from './components/EvolutionMetric';
+import { AntigravityParticleField, Antigravity } from '../components/Antigravity';
+import { AntigravitySync, type DesignMachineState } from '../services/figmaApi';
 
 // Define the philosophical states from the transcript
 const STATES = [
@@ -119,6 +121,41 @@ export default function App() {
 
   const [pressure, setPressure] = useState(0);
   const [strikeLog, setStrikeLog] = useState<any[]>([]);
+  const [figmaState, setFigmaState] = useState<DesignMachineState | null>(null);
+
+  // Antigravity Sync: Connect to Figma design_machine_state
+  useEffect(() => {
+    const figmaFileKey = import.meta.env.VITE_FIGMA_FILE_KEY;
+    const figmaToken = import.meta.env.VITE_FIGMA_ACCESS_TOKEN;
+    const syncInterval = parseInt(import.meta.env.VITE_ANTIGRAVITY_SYNC_INTERVAL || '30000');
+
+    if (!figmaFileKey || !figmaToken) {
+      console.warn('[AntigravitySync] Figma credentials not configured. Skipping sync.');
+      return;
+    }
+
+    const antigravity = new AntigravitySync(
+      figmaFileKey,
+      figmaToken,
+      (state) => {
+        setFigmaState(state);
+        // Update metrics with Figma state
+        setMetrics(prev => ({
+          ...prev,
+          coherence: state.coherence,
+          bridgeStatus: state.designSync ? 'FIGMA_SYNCED' : prev.bridgeStatus,
+        }));
+      },
+      syncInterval
+    );
+
+    antigravity.start();
+    console.log('[App] Antigravity sync started - triangulating API (Figma → GitHub → github.io)');
+
+    return () => {
+      antigravity.stop();
+    };
+  }, []);
 
   // Manually wiring the 9090 Bridge frequency
   useEffect(() => {
@@ -233,12 +270,16 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-300 font-mono p-4 sm:p-8 flex flex-col pt-20 relative">
+      {/* Antigravity particle field - zero-gravity hosting effect */}
+      <AntigravityParticleField />
+      
       <VantagePointLattice isRunning={isRunning} currentStateId={currentState.id} />
       
       <div className="relative z-10 flex flex-col">
         <StateOracle />
         <QuantumCookieDialog />
-        <header className="mb-8 border-b border-zinc-800 pb-6 flex items-center justify-between bg-zinc-950/80 backdrop-blur-md p-4 rounded-xl">
+        <Antigravity intensity={1.2}>
+          <header className="mb-8 border-b border-zinc-800 pb-6 flex items-center justify-between bg-zinc-950/80 backdrop-blur-md p-4 rounded-xl">
           <div>
             <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-3">
               <RefreshCcw className="w-6 h-6 text-emerald-400" />
@@ -270,6 +311,7 @@ export default function App() {
           </button>
         </div>
       </header>
+      </Antigravity>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Visualization */}

@@ -4,7 +4,13 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "build:canvas": "vite build --mode canvas",
+    "build:state-machine": "vite build --mode state-machine",
+    "build:cosweet": "npm run build:canvas && npm run build:state-machine && npm run build:merge",
+    "build:merge": "node scripts/cosweet-merge.js",
+    "dev": "vite",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
