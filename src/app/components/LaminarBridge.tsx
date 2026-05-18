@@ -64,7 +64,7 @@ export function LaminarBridge() {
           </div>
           <div className="flex items-center gap-4 text-xs font-mono">
             <div className="flex items-center gap-2 bg-zinc-950 px-3 py-1.5 rounded-md border border-zinc-800">
-              <Radio className={\`w-3 h-3 \${pulse ? 'text-emerald-400' : 'text-zinc-600'} transition-colors\`} />
+              <Radio className={`w-3 h-3 \${pulse ? 'text-emerald-400' : 'text-zinc-600'} transition-colors`} />
               <span className="text-zinc-400">FREQ:</span> 
               <span className="text-emerald-400">119 Hz</span>
             </div>

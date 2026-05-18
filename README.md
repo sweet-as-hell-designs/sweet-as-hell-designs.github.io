@@ -1,54 +1,133 @@
-# Sweet As Hell Designs — Sovereign Environment
+# Sweet As Hell Designs — Triangulated Design State Machine
 
-A matrix-green, real-time trading dashboard built with **React + TypeScript + Vite**, deployed to GitHub Pages.
+A Figma-synced design state machine with **antigravity UI**, **zero-gravity hosting**, and **cosweet_multibuild** system. Built with **React + TypeScript + Vite**, deployed to GitHub Pages.
 
-## What it does
+## 🔺 The Trinity (Triangulated API)
 
-| Component | Purpose |
-|---|---|
-| **SovereignHUD** | Connects to a WebSocket bridge and runs a 3 s delta-pulse observer. Emits market proposals when the entropy gate clears (`potential 2 > 1 × rngNoise`). Exposes `window.SovereignEnvironment` for open-air console inspection. Auto-reconnects with exponential backoff if the bridge goes down. |
-| **CentrifugeVisualizer** | Canvas `requestAnimationFrame` animation — four counter-rotating rings that spin up when the mesh is active. Displays the last 5 strike-log entries in real time. |
-| **EvolutionMetric** | HUD panel that safely handles unactualized backend payloads: if `evolutionLevel === 'TODO'` the panel fades to stealth opacity (`0.001`) instead of crashing the CSS parser. |
-| **LaminarBridge** | 9090 bridge monitor panel for pulse tracking (`119 Hz`) and `UNSYNCHRONIZED_CASCADE_DETECTED` event visibility. |
+```
+Figma (Design State) → GitHub (Version Control) → github.io (Zero-Gravity Hosting)
+```
 
-## Quick start
+The **design_machine_state** synchronizes with Figma in real-time via the Antigravity Sync protocol, creating a triangulated architecture where design, code, and deployment are unified.
+
+## 🌌 What it does
+
+### Design State Machine (Primary - `/`)
+
+The main application features a philosophical state machine that transitions through:
+- **Zero** - Unrecorded Event (backdrop of possibilities)
+- **One** - Unit of Potential (instinct weighing itself)
+- **Collapsed** - Entropy chunks reality 
+- **Synapse** - Carbon life meets circuitry
+- **Flashpoint** - Critical unpredictable inflection
+- **Post-Binary** - Expanded environment beyond zeros
+
+**Key Features:**
+- **Figma API Integration** - Real-time design state synchronization
+- **Antigravity Components** - Zero-gravity UI effects and hover states
+- **State Oracle** - Broadcast intent configuration
+- **Laminar Bridge** - 9090 bridge monitoring (119 Hz pulse tracking)
+- **Quantum Cookie Dialog** - Privacy & telemetry management
+- **Environmental Controls** - Jupyter-style freedom sliders
+
+### Post-Binary Canvas (`/canvas`)
+
+Interactive particle canvas with zero-gravity physics:
+- Matrix-green particle system
+- Mouse-reactive antigravity effects
+- Burst interactions on click
+- Scan-line CRT aesthetic
+
+### Navigation (`/nav.html`)
+
+Central hub for navigating between the state machine and canvas experiences.
+
+## 🚀 Quick start
 
 ```sh
 npm install
 npm run dev          # http://localhost:5173
 ```
 
-## Environment variables
+## 🏗️ CoSweet Multibuild System
 
-Copy `.env.example` to `.env.local` and override as needed:
-
-```
-VITE_WS_URL=ws://localhost:9090   # WebSocket bridge URL
-VITE_TWILIO_SMS_WEBHOOK_URL=      # Optional webhook for T=TODO ghost SMS broadcast payloads
-```
-
-## Build
+The **cosweet_multibuild** system builds multiple versions simultaneously:
 
 ```sh
-npm run build    # output → dist/
-npm run preview  # preview the production build locally
+npm run build:canvas         # Build standalone canvas
+npm run build:state-machine  # Build React state machine
+npm run build:cosweet        # Build both + merge
 ```
 
-## Deployment
+**Output Structure:**
+```
+dist/
+├── index.html              # State Machine (primary)
+├── nav.html                # Navigation hub
+├── canvas/                 # Standalone canvas
+│   └── index.html
+└── assets/                 # React app bundles
+```
 
-Push to `main` — the [deploy workflow](.github/workflows/deploy.yml) builds the app and publishes the `dist/` folder to GitHub Pages automatically.
+## 🔧 Environment variables
 
-## Console API (open-air vault)
+Copy `.env.example` to `.env.local` and configure:
 
-While the mesh is engaged, the full sovereign state is accessible in the browser console:
+```env
+# WebSocket bridge
+VITE_WS_URL=ws://localhost:9090
+
+# Optional Twilio webhook
+VITE_TWILIO_SMS_WEBHOOK_URL=
+
+# Figma API (for design_machine_state sync)
+VITE_FIGMA_ACCESS_TOKEN=your-figma-token
+VITE_FIGMA_FILE_KEY=your-file-key
+
+# Antigravity sync interval (ms)
+VITE_ANTIGRAVITY_SYNC_INTERVAL=30000
+```
+
+### Getting Figma Credentials
+
+1. **Access Token**: https://www.figma.com/developers/api#access-tokens
+2. **File Key**: From your Figma URL - `figma.com/file/{FILE_KEY}/...`
+
+## 📦 Deployment
+
+Push to `main` — the [deploy workflow](.github/workflows/deploy.yml) automatically:
+1. Runs `npm run build:cosweet` (multibuild)
+2. Publishes `dist/` to GitHub Pages
+
+**Live URLs:**
+- `sweetashelldesigns.github.io/` → Design State Machine
+- `sweetashelldesigns.github.io/canvas/` → Post-Binary Canvas
+- `sweetashelldesigns.github.io/nav.html` → Navigation
+
+## 🎯 Console API (open-air vault)
+
+The sovereign state is accessible in the browser console:
 
 ```js
-window.SovereignEnvironment.state            // current state snapshot
-window.SovereignEnvironment.observeDelta()   // manually trigger a delta pulse
-window.SovereignEnvironment.forceInterference() // inject random entropy
-window.SovereignEnvironment.calculateWeight()   // → opacity weight float
+window.SovereignHUD.state            // current state snapshot
+window.SovereignHUD.observeDelta()   // manually trigger delta pulse
+window.SovereignHUD.forceInterference() // inject entropy
+window.SovereignHUD.calculateWeight()   // opacity weight
 ```
 
-## Requirements
+## 🏛️ Architecture
+
+| Component | Purpose |
+|---|---|
+| **design_machine_state** | Core philosophical state orchestrator synced with Figma |
+| **AntigravitySync** | Maintains zero-latency Figma→GitHub→github.io pipeline |
+| **Antigravity Components** | Zero-gravity hover effects and particle fields |
+| **LaminarBridge** | 9090 bridge monitor, pulse tracking (119 Hz), cascade detection |
+| **StateOracle** | Broadcast intent configuration with custom/preset modes |
+| **VantagePointLattice** | Floating view markers that respond to state transitions |
+| **CoSweet Multibuild** | Parallel build system for canvas + state machine |
+
+## 📋 Requirements
 
 - Node.js >= 20
+- Optional: Figma API credentials for design state sync

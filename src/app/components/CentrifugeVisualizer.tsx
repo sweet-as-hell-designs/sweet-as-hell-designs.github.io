@@ -33,7 +33,7 @@ export function CentrifugeVisualizer({ pressure, strikeLog }: CentrifugeVisualiz
           
           return (
             <motion.div
-              key={\`\${strike.p}-\${strike.t}\`}
+              key={`\${strike.p}-\${strike.t}`}
               initial={{ opacity: 0, scale: 0.1, rotate: 0 }}
               animate={{ 
                 opacity: [0, 0.8, 0],
@@ -47,26 +47,26 @@ export function CentrifugeVisualizer({ pressure, strikeLog }: CentrifugeVisualiz
               }}
               className="absolute flex items-center justify-center"
               style={{
-                left: \`\${x}%\`,
-                top: \`\${y}%\`,
-                transform: \`translate(-50%, -50%)\`
+                left: `\${x}%`,
+                top: `\${y}%`,
+                transform: `translate(-50%, -50%)`
               }}
             >
               {/* Geometric Lens */}
               <div 
-                className={\`relative w-48 h-48 border-[0.5px] flex items-center justify-center
+                className={`relative w-48 h-48 border-[0.5px] flex items-center justify-center
                   \${isHostile 
                     ? 'border-rose-500/80 bg-rose-500/10 shadow-[0_0_40px_rgba(244,63,94,0.5)]' 
                     : 'border-[#00ff41]/30 bg-[#00ff41]/5 shadow-[0_0_20px_rgba(0,255,65,0.2)]'
                   } 
-                  backdrop-blur-md rounded-full\`}
+                  backdrop-blur-md rounded-full`}
               >
                 {/* Inner Hexagon / Wireframe */}
-                <div className={\`absolute inset-2 border border-dashed rounded-full animate-[spin_3s_linear_infinite] \${isHostile ? 'border-rose-500/50' : 'border-[#00ff41]/30'}\`} />
-                <div className={\`absolute inset-6 border border-dotted rounded-full animate-[spin_2s_linear_infinite_reverse] \${isHostile ? 'border-rose-400/50' : 'border-[#00ff41]/40'}\`} />
+                <div className={`absolute inset-2 border border-dashed rounded-full animate-[spin_3s_linear_infinite] \${isHostile ? 'border-rose-500/50' : 'border-[#00ff41]/30'}`} />
+                <div className={`absolute inset-6 border border-dotted rounded-full animate-[spin_2s_linear_infinite_reverse] \${isHostile ? 'border-rose-400/50' : 'border-[#00ff41]/40'}`} />
                 
-                <div className={\`text-[10px] font-mono font-bold tracking-widest text-center
-                  \${isHostile ? 'text-rose-400' : 'text-[#00ff41]/80'}\`}
+                <div className={`text-[10px] font-mono font-bold tracking-widest text-center
+                  \${isHostile ? 'text-rose-400' : 'text-[#00ff41]/80'}`}
                 >
                   {isHostile ? (
                     <div className="flex flex-col items-center">

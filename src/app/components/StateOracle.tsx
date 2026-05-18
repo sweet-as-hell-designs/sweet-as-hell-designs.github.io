@@ -73,7 +73,7 @@ export function StateOracle() {
       </AnimatePresence>
 
       {/* Add a subtle custom scrollbar style inside index.css or equivalent, but we can do it via style tag for now */}
-      <style>{\`
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
@@ -88,14 +88,14 @@ export function StateOracle() {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(161, 161, 170, 0.5);
         }
-      \`}</style>
+      `}</style>
 
       {/* Pill Toggle */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className={\`relative flex items-center gap-3 px-4 py-2 rounded-full border shadow-lg backdrop-blur-md transition-all \${
+        className={`relative flex items-center gap-3 px-4 py-2 rounded-full border shadow-lg backdrop-blur-md transition-all \${
           isBroadcasting ? 'bg-zinc-900/90 border-emerald-500/40 text-emerald-400' : 'bg-zinc-900/90 border-zinc-700 text-zinc-400'
-        }\`}
+        }`}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -107,7 +107,7 @@ export function StateOracle() {
               className="absolute inset-0 bg-emerald-500 rounded-full"
             />
           )}
-          <Radio className={\`w-4 h-4 relative z-10 \${isBroadcasting ? 'text-emerald-400' : 'text-zinc-500'}\`} />
+          <Radio className={`w-4 h-4 relative z-10 \${isBroadcasting ? 'text-emerald-400' : 'text-zinc-500'}`} />
         </div>
         
         <div className="flex flex-col items-start">
@@ -119,7 +119,7 @@ export function StateOracle() {
           </span>
         </div>
 
-        <ChevronDown className={\`w-4 h-4 ml-2 transition-transform \${isOpen ? 'rotate-180' : ''}\`} />
+        <ChevronDown className={`w-4 h-4 ml-2 transition-transform \${isOpen ? 'rotate-180' : ''}`} />
       </motion.button>
 
       {/* Expandable Menu */}
@@ -162,11 +162,11 @@ export function StateOracle() {
                       setIntent(preset);
                       setCustomIntent("");
                     }}
-                    className={\`w-full text-left px-3 py-2 rounded text-xs transition-colors flex items-center justify-between \${
+                    className={`w-full text-left px-3 py-2 rounded text-xs transition-colors flex items-center justify-between \${
                       intent === preset && !customIntent
                         ? 'bg-purple-500/10 text-purple-300 border border-purple-500/30' 
                         : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 border border-transparent'
-                    }\`}
+                    }`}
                   >
                     <span className="truncate">{preset}</span>
                     {intent === preset && !customIntent && <Check className="w-3 h-3" />}
@@ -197,15 +197,15 @@ export function StateOracle() {
               {/* Limitless Toggle */}
               <button 
                 onClick={() => setIsLimitless(!isLimitless)}
-                className={\`flex items-center justify-between w-full px-3 py-2 rounded border transition-colors \${
+                className={`flex items-center justify-between w-full px-3 py-2 rounded border transition-colors \${
                   isLimitless ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-zinc-900 border-zinc-800 text-zinc-500'
-                }\`}
+                }`}
               >
                 <div className="flex items-center gap-2 text-xs">
                   <Layers className="w-3.5 h-3.5" />
                   <span>Limitless Propagation</span>
                 </div>
-                <div className={\`w-6 h-3.5 rounded-full relative transition-colors \${isLimitless ? 'bg-emerald-500' : 'bg-zinc-700'}\`}>
+                <div className={`w-6 h-3.5 rounded-full relative transition-colors \${isLimitless ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
                   <motion.div 
                     className="absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-white rounded-full shadow-sm"
                     animate={{ x: isLimitless ? 10 : 0 }}
@@ -218,7 +218,7 @@ export function StateOracle() {
                 onClick={handlePropagate}
                 className="w-full py-2.5 bg-zinc-100 text-zinc-900 hover:bg-white text-xs font-bold uppercase tracking-wider rounded flex items-center justify-center gap-2 transition-colors mt-2"
               >
-                <RefreshCw className={\`w-3.5 h-3.5 \${isBroadcasting ? 'animate-spin' : ''}\`} />
+                <RefreshCw className={`w-3.5 h-3.5 \${isBroadcasting ? 'animate-spin' : ''}`} />
                 Propagate Status
               </button>
             </div>

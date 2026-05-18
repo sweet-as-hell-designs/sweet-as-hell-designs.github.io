@@ -5,8 +5,12 @@
  * Creates the triangulated architecture: Figma → GitHub → github.io
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const CANVAS_BUILD = path.join(__dirname, '..', 'dist-canvas');
@@ -24,6 +28,14 @@ const canvasTarget = path.join(DIST_DIR, 'canvas');
 if (fs.existsSync(CANVAS_BUILD)) {
   console.log('[CoSweetMerge] Copying canvas build...');
   copyRecursive(CANVAS_BUILD, canvasTarget);
+  
+  // Rename canvas.html to index.html in the canvas directory
+  const canvasHtmlSrc = path.join(canvasTarget, 'canvas.html');
+  const canvasHtmlDest = path.join(canvasTarget, 'index.html');
+  if (fs.existsSync(canvasHtmlSrc)) {
+    fs.renameSync(canvasHtmlSrc, canvasHtmlDest);
+    console.log('[CoSweetMerge] Renamed canvas.html to index.html in /canvas');
+  }
 } else {
   console.warn('[CoSweetMerge] Canvas build not found, skipping...');
 }

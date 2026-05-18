@@ -126,7 +126,7 @@ export function QuantumCookieDialog() {
                         </div>
                         <button 
                           onClick={() => setPreferences(p => ({ ...p, superposition: !p.superposition }))}
-                          className={\`relative w-10 h-5 rounded-full transition-colors \${preferences.superposition ? 'bg-purple-500' : 'bg-zinc-800'}\`}
+                          className={`relative w-10 h-5 rounded-full transition-colors \${preferences.superposition ? 'bg-purple-500' : 'bg-zinc-800'}`}
                         >
                           <motion.div 
                             className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm"
@@ -147,7 +147,7 @@ export function QuantumCookieDialog() {
                         </div>
                         <button 
                           onClick={() => setPreferences(p => ({ ...p, crossLanguage: !p.crossLanguage }))}
-                          className={\`relative w-10 h-5 rounded-full transition-colors \${preferences.crossLanguage ? 'bg-blue-500' : 'bg-zinc-800'}\`}
+                          className={`relative w-10 h-5 rounded-full transition-colors \${preferences.crossLanguage ? 'bg-blue-500' : 'bg-zinc-800'}`}
                         >
                           <motion.div 
                             className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm"
@@ -168,7 +168,7 @@ export function QuantumCookieDialog() {
                         </div>
                         <button 
                           onClick={() => setPreferences(p => ({ ...p, telemetry: !p.telemetry }))}
-                          className={\`relative w-10 h-5 rounded-full transition-colors \${preferences.telemetry ? 'bg-emerald-500' : 'bg-zinc-800'}\`}
+                          className={`relative w-10 h-5 rounded-full transition-colors \${preferences.telemetry ? 'bg-emerald-500' : 'bg-zinc-800'}`}
                         >
                           <motion.div 
                             className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm"

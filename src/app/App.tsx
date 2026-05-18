@@ -292,11 +292,11 @@ export default function App() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => setIsRunning(!isRunning)}
-            className={\`px-4 py-2 rounded-md font-semibold flex items-center gap-2 transition-colors \${
+            className={`px-4 py-2 rounded-md font-semibold flex items-center gap-2 transition-colors ${
               isRunning 
                 ? 'bg-rose-950/50 text-rose-400 border border-rose-900/50 hover:bg-rose-900/50' 
                 : 'bg-emerald-950/50 text-emerald-400 border border-emerald-900/50 hover:bg-emerald-900/50'
-            }\`}
+            }`}
           >
             {isRunning ? <Square className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             {isRunning ? 'Halt Process' : 'Engage Mesh'}
@@ -322,7 +322,7 @@ export default function App() {
             <div 
               className="absolute inset-0 z-0 pointer-events-none opacity-20"
               style={{
-                backgroundImage: controls.texture > 0 ? \`radial-gradient(circle, #ffffff \${controls.texture}%, transparent \${controls.texture + 1}%)\` : 'none',
+                backgroundImage: controls.texture > 0 ? `radial-gradient(circle, #ffffff \${controls.texture}%, transparent \${controls.texture + 1}%)` : 'none',
                 backgroundSize: '4px 4px'
               }}
             />
@@ -331,13 +331,13 @@ export default function App() {
             <div 
               className="relative w-full max-w-[400px] aspect-square z-10 transition-all duration-300"
               style={{
-                filter: \`
+                filter: `
                   hue-rotate(\${controls.globalHue}deg) 
                   saturate(\${100 + controls.saturation + (controls.vibrance * 0.5)}%) 
                   contrast(\${100 + controls.contrast}%)
                   blur(\${Math.max(0, -controls.clarity / 20)}px)
                   drop-shadow(0 0 \${Math.max(0, controls.dehaze / 2)}px rgba(255,255,255,\${controls.dehaze / 200}))
-                \`
+                `
               }}
             >
               {STATES.map((state, index) => {
@@ -351,27 +351,27 @@ export default function App() {
                 return (
                   <motion.div
                     key={state.id}
-                    className={\`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full border-2 flex items-center justify-center p-3 text-center transition-all duration-500 z-10 \${
+                    className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full border-2 flex items-center justify-center p-3 text-center transition-all duration-500 z-10 ${
                       isActive 
-                        ? \`\${state.activeBorderColor} \${state.bgColor} shadow-[0_0_30px_rgba(0,0,0,0.5)] \${state.shadowColor}\` 
+                        ? `${state.activeBorderColor} ${state.bgColor} shadow-[0_0_30px_rgba(0,0,0,0.5)] ${state.shadowColor}` 
                         : 'border-zinc-800 bg-zinc-950 opacity-40'
-                    }\`}
+                    }`}
                     style={{
-                      transform: \`translate(calc(-50% + \${x}px), calc(-50% + \${y}px))\`
+                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                     }}
                     animate={{
                       scale: isActive ? 1.1 : 1,
                     }}
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <span className={\`text-[10px] uppercase font-bold tracking-wider \${isActive ? state.color : 'text-zinc-600'}\`}>
+                      <span className={`text-[10px] uppercase font-bold tracking-wider \${isActive ? state.color : 'text-zinc-600'}`}>
                         {state.id}
                       </span>
                       {isActive && (
                         <motion.div 
                           initial={{ opacity: 0, scale: 0.5 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className={\`w-2 h-2 rounded-full \${state.dotColor} mt-1 shadow-[0_0_10px_currentColor]\`}
+                          className={`w-2 h-2 rounded-full \${state.dotColor} mt-1 shadow-[0_0_10px_currentColor]`}
                         />
                       )}
                     </div>
@@ -381,13 +381,13 @@ export default function App() {
 
               {/* Central Connection / Core */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className={\`w-24 h-24 rounded-full border border-dashed flex items-center justify-center transition-colors duration-1000 \${currentState.borderColor}\`}>
+                <div className={`w-24 h-24 rounded-full border border-dashed flex items-center justify-center transition-colors duration-1000 \${currentState.borderColor}`}>
                   <motion.div 
                     animate={{ rotate: isRunning ? 360 : 0 }}
                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                     className="absolute inset-0 border border-transparent border-t-zinc-700 rounded-full"
                   />
-                  <RefreshCcw className={\`w-6 h-6 opacity-50 \${currentState.color}\`} />
+                  <RefreshCcw className={`w-6 h-6 opacity-50 \${currentState.color}`} />
                 </div>
               </div>
               
@@ -431,7 +431,7 @@ export default function App() {
             </h2>
             <div className="flex flex-col gap-2">
               <div className="text-xl font-bold text-zinc-100">{currentState.label}</div>
-              <div className={\`text-sm \${currentState.color}\`}>{currentState.desc}</div>
+              <div className={`text-sm \${currentState.color}`}>{currentState.desc}</div>
             </div>
             
             <div className="mt-6 pt-6 border-t border-zinc-800/50 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -517,7 +517,7 @@ export default function App() {
                 <div className="h-2 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
                   <motion.div 
                     className="h-full bg-orange-500"
-                    animate={{ width: \`\${metrics.heat}%\` }}
+                    animate={{ width: `\${metrics.heat}%` }}
                     transition={{ type: "spring", bounce: 0 }}
                   />
                 </div>
@@ -531,7 +531,7 @@ export default function App() {
                 <div className="h-2 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
                   <motion.div 
                     className="h-full bg-cyan-400"
-                    animate={{ width: \`\${metrics.energy}%\` }}
+                    animate={{ width: `\${metrics.energy}%` }}
                     transition={{ type: "spring", bounce: 0 }}
                   />
                 </div>
